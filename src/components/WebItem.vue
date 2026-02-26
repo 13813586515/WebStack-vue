@@ -28,7 +28,10 @@
     <div v-else class="list-view-container">
       <div class="list-item" v-for="(web, idx) in websites" :key="idx" @click="openweb(web.url)">
         <img :src="web.logo" class="lozad list-logo">
-        <span class="list-title">{{web.title}}</span>
+        <div class="list-content">
+          <span class="list-title">{{web.title}}</span>
+          <span class="list-desc">{{web.desc}}</span>
+        </div>
         <span class="list-url">{{web.url}}</span>
       </div>
     </div>
@@ -70,46 +73,60 @@ i {
 }
 .list-view-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
 }
 .list-item {
   display: flex;
   align-items: center;
   padding: 10px 15px;
-  background: #fafafa;
+  background: #fff;
+  border: 1px solid #eee;
   border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s;
-  width: calc(50% - 5px);
-  box-sizing: border-box;
+  transition: all 0.2s;
 }
 .list-item:hover {
-  background: #f0f0f0;
+  background: #fafafa;
+  border-color: #00b39b;
 }
 .list-logo {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 3px;
-  margin-right: 10px;
+  margin-right: 12px;
   flex-shrink: 0;
 }
+.list-content {
+  flex: 1;
+  min-width: 0;
+  margin-right: 15px;
+}
 .list-title {
-  font-size: 13px;
+  font-size: 14px;
   color: #333;
-  margin-right: 10px;
+  font-weight: 500;
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex: 1;
-  max-width: 180px;
+}
+.list-desc {
+  font-size: 12px;
+  color: #999;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
 }
 .list-url {
-  font-size: 11px;
-  color: #999;
+  font-size: 12px;
+  color: #bbb;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
+  max-width: 200px;
+  flex-shrink: 0;
 }
 </style>

@@ -81,19 +81,28 @@
               </li>
             </ul>
           </li>
-          <li class="search-box-wrapper">
-            <div class="search-box">
-              <input
-                type="text"
-                v-model="searchQuery"
-                placeholder="搜索网站..."
-                class="search-input"
-              />
-              <button class="search-clear" @click.stop="clearSearch" v-if="searchQuery">
-                <i class="fa fa-times"></i>
-              </button>
-            </div>
+          <li class="search-toggle">
+            <a href="javascript:void(0)" @click="toggleSearchBox" v-if="!showSearchBox">
+              <i class="fa-search"></i>
+            </a>
           </li>
+          <transition name="fade">
+            <li v-if="showSearchBox" class="search-box-wrapper">
+              <div class="search-box">
+                <input
+                  ref="searchInput"
+                  type="text"
+                  v-model="searchQuery"
+                  placeholder="搜索网站..."
+                  class="search-input"
+                  @blur="handleSearchBlur"
+                />
+                <button class="search-clear" @mousedown.prevent="clearSearch" v-if="searchQuery">
+                  <i class="fa fa-times"></i>
+                </button>
+              </div>
+            </li>
+          </transition>
         </ul>
         <ul class="user-info-menu right-links list-inline list-unstyled">
           <li class="view-toggle-group">
@@ -167,6 +176,7 @@ export default {
       items: itemsData,
       searchQuery: "",
       viewMode: "grid",
+      showSearchBox: false,
       lang: {},
       langList: [
         {
@@ -185,6 +195,15 @@ export default {
   created() {
     this.lang = this.langList[0];
     loadJs();
+  },
+  watch: {
+    showSearchBox(val) {
+      if (val) {
+        this.$nextTick(() => {
+          this.$refs.searchInput && this.$refs.searchInput.focus();
+        });
+      }
+    }
   },
   computed: {
     filteredItems() {
@@ -243,6 +262,21 @@ export default {
     clearSearch() {
       this.searchQuery = "";
     },
+    toggleSearchBox() {
+      this.showSearchBox = !this.showSearchBox;
+      if (this.showSearchBox) {
+        this.$nextTick(() => {
+          this.$refs.searchInput && this.$refs.searchInput.focus();
+        });
+      }
+    },
+    handleSearchBlur() {
+      setTimeout(() => {
+        if (!this.searchQuery) {
+          this.showSearchBox = false;
+        }
+      }, 200);
+    },
     isCategoryHighlighted(category) {
       const query = this.searchQuery.toLowerCase().trim();
       if (!query) return false;
@@ -267,6 +301,9 @@ export default {
 </script>
 
 <style>
+.sidebar-menu.fixed .sidebar-menu-inner {
+  z-index: 1000;
+}
 .page-container > .main-content {
   padding-top: 62px;
 }
@@ -274,7 +311,7 @@ export default {
   position: fixed;
   top: 0;
   right: 0;
-  left: 260px;
+  left: 280px;
   z-index: 999;
   margin: 0;
   border-bottom: 1px solid #e8e8e8;
@@ -282,6 +319,39 @@ export default {
 }
 .sidebar-menu.collapsed + .main-content .navbar.user-info-navbar.navbar-fixed-top {
   left: 80px;
+}
+.right-links .view-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0 10px 0 0;
+  height: 30px;
+  line-height: 30px;
+}
+.right-links .view-toggle-group a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  color: #999;
+  transition: all 0.2s;
+  text-decoration: none;
+  background: #fff;
+  height: 30px;
+}
+.right-links .view-toggle-group a:first-child {
+  border-right: 1px solid #ddd;
+}
+.right-links .view-toggle-group a:hover {
+  color: #00b39b;
+  background: #f5f5f5;
+}
+.right-links .view-toggle-group a.active {
+  color: #fff;
+  background: #00b39b;
 }
 .search-box-wrapper {
   display: inline-block;
@@ -326,37 +396,6 @@ export default {
 .search-clear:hover {
   color: #666;
 }
-.right-links .view-toggle-group {
-  display: flex !important;
-  flex-direction: row !important;
-  float: left;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 15px 10px 0 0;
-}
-.right-links .view-toggle-group a {
-  display: inline-block !important;
-  padding: 7px 12px !important;
-  color: #999;
-  transition: all 0.2s;
-  text-decoration: none;
-  border: none;
-  background: #fff;
-  float: none !important;
-  line-height: 1;
-}
-.right-links .view-toggle-group a:first-child {
-  border-right: 1px solid #ddd;
-}
-.right-links .view-toggle-group a:hover {
-  color: #00b39b;
-  background: #f5f5f5;
-}
-.right-links .view-toggle-group a.active {
-  color: #fff;
-  background: #00b39b;
-}
 .no-result {
   text-align: center;
   padding: 80px 20px;
@@ -370,5 +409,23 @@ export default {
 .no-result p {
   font-size: 16px;
   margin: 0;
+}
+.search-toggle {
+  cursor: pointer;
+}
+.search-toggle a {
+  font-size: 16px;
+  color: #999;
+  transition: color 0.2s;
+}
+.search-toggle a:hover {
+  color: #00b39b;
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s, width 0.2s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  width: 0;
 }
 </style>
